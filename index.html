@@ -4,19 +4,70 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minisoft(tm) OS Terminal</title>
-    <!-- Linking your external style.css -->
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background-color: #0c0c0c;
+            color: #cccccc;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #terminal {
+            width: 90%;
+            max-width: 900px;
+            height: 80vh;
+            background-color: #000000;
+            border: 1px solid #333;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        #output {
+            white-space: pre-wrap;
+            margin-bottom: 10px;
+        }
+        .input-line {
+            display: flex;
+        }
+        .prompt {
+            color: #3b82f6;
+            margin-right: 10px;
+            white-space: nowrap;
+        }
+        input {
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-family: inherit;
+            font-size: inherit;
+            outline: none;
+            flex-grow: 1;
+        }
+        .ai-reply {
+            color: #ffffff;
+            margin: 10px 0;
+        }
+        .error {
+            color: #ff5555;
+        }
+    </style>
 </head>
 <body>
     <div id="terminal">
         <div id="output">
-            MINISOFT(TM) TERMINAL [Version 2.4.0]<br>
-            (C) 2026 MINISOFT CORPORATION. ALL RIGHTS RESERVED.<br>
-            KERNEL STATUS: <span style="color: #22ff22;">ONLINE</span><br>
+            MINISOFT(TM) TERMINAL [Version 2.4.0]
+            (C) 2026 MINISOFT CORPORATION. ALL RIGHTS RESERVED.
+            KERNEL STATUS: ONLINE
             --------------------------------------------------
+            Type a command to begin.
         </div>
         <div class="input-line">
-            <span class="prompt">C:\USERS\CEO></span>
+            <span class="prompt" id="prompt-label">C:\USERS\USER></span>
             <input type="text" id="user-input" autofocus autocomplete="off">
         </div>
     </div>
@@ -24,22 +75,46 @@
     <script>
         const input = document.getElementById('user-input');
         const output = document.getElementById('output');
+        const promptLabel = document.getElementById('prompt-label');
         
-        // This is your official Minisoft(tm) Backend link
+        // Ensure these URLs match your Render service name
         const API_URL = 'https://minisofttmai.onrender.com/chat'; 
+        const VERIFY_URL = 'https://minisofttmai.onrender.com/verify-secret'; 
 
         input.addEventListener('keypress', async (e) => {
             if (e.key === 'Enter') {
                 const userMessage = input.value;
                 if (!userMessage.trim()) return;
 
-                // Display user command in the terminal
-                output.innerHTML += `<div><span class="prompt">C:\\USERS\\CEO></span> ${userMessage}</div>`;
+                // Display user command in output
+                const currentPrompt = promptLabel.innerText;
+                output.innerHTML += `<div><span class="prompt">${currentPrompt}</span> ${userMessage}</div>`;
                 input.value = '';
-                
-                // Scroll to bottom
-                output.scrollTop = output.scrollHeight;
 
+                // 1. Check for the Secret CEO Phrase via Render
+                try {
+                    const verifyResponse = await fetch(VERIFY_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ secret: userMessage })
+                    });
+                    const verifyData = await verifyResponse.json();
+
+                    if (verifyData.status === "success") {
+                        promptLabel.innerText = "C:\\USERS\\CEO>";
+                        output.innerHTML += `<div class="ai-reply">
+                            Hello! I am Minisoft(tm) AI. It is a pleasure to meet you.<br><br>
+                            I am proud to be a creation of the Minisoft CEO, whose incredible hard work and relentless perseverance have made everything we do possible. Their dedication to innovation is truly inspiring.<br><br>
+                            How can I assist you today, Boss?
+                        </div>`;
+                        scrollToBottom();
+                        return; 
+                    }
+                } catch (err) {
+                    console.log("Verification check skipped or failed.");
+                }
+
+                // 2. Regular AI Chat Flow
                 try {
                     const response = await fetch(API_URL, {
                         method: 'POST',
@@ -48,17 +123,23 @@
                     });
 
                     const data = await response.json();
-                    
-                    // Display AI response
-                    output.innerHTML += `<div class="ai-reply">${data.response}</div>`;
+                    if (data.response) {
+                        output.innerHTML += `<div class="ai-reply">${data.response}</div>`;
+                    } else {
+                        output.innerHTML += `<div class="error">SYSTEM ERROR: Invalid kernel response.</div>`;
+                    }
                 } catch (error) {
-                    output.innerHTML += `<div class="error">SYSTEM ERROR: Could not connect to Minisoft(tm) Kernel.</div>`;
+                    output.innerHTML += `<div class="error">SYSTEM ERROR: Kernel connection lost.</div>`;
                 }
 
-                // Auto-scroll after reply
-                output.scrollTop = output.scrollHeight;
+                scrollToBottom();
             }
         });
+
+        function scrollToBottom() {
+            const terminal = document.getElementById('terminal');
+            terminal.scrollTop = terminal.scrollHeight;
+        }
     </script>
 </body>
 </html>
