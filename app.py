@@ -12,7 +12,7 @@ SECRET_PHRASE = os.environ.get("SECRET_PHRASE")
 
 # Configure the Gemini AI
 genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel('gemini-pro')
+model = genai.GenerativeModel('gemini-3.1-flash')
 
 @app.route('/')
 def home():
