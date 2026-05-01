@@ -1,0 +1,56 @@
+/* Minisoft(tm) OS Terminal Styling */
+body { 
+    background-color: #0a0a0a; 
+    color: #22ff22; 
+    font-family: 'Courier New', monospace; 
+    margin: 0; 
+    padding: 20px; 
+    overflow: hidden; 
+}
+
+#terminal { 
+    height: 95vh; 
+    overflow-y: auto; 
+    border: 1px solid #333; 
+    padding: 15px; 
+    background: rgba(0, 0, 0, 0.9); 
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.1); 
+}
+
+.input-line { 
+    display: flex; 
+    margin-top: 10px; 
+}
+
+.prompt { 
+    color: #888; 
+    margin-right: 10px; 
+}
+
+#user-input { 
+    background: transparent; 
+    border: none; 
+    color: #22ff22; 
+    font-family: inherit; 
+    font-size: inherit; 
+    outline: none; 
+    width: 100%; 
+}
+
+.ai-reply { 
+    color: #ffffff; 
+    margin: 12px 0; 
+    padding-left: 15px; 
+    border-left: 2px solid #22ff22; 
+    white-space: pre-wrap; 
+    line-height: 1.4; 
+}
+
+.error { 
+    color: #ff4444; 
+    font-weight: bold; 
+}
+
+/* Custom scrollbar for that 2026 tech look */
+#terminal::-webkit-scrollbar { width: 6px; }
+#terminal::-webkit-scrollbar-thumb { background: #22ff22; border-radius: 10px; }
