@@ -1,39 +1,62 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Minisoft(tm) Terminal</title>
-    <style>
-        body { background: #0a0a0a; color: #22ff22; font-family: monospace; padding: 20px; }
-        #terminal { height: 90vh; overflow-y: auto; border: 1px solid #333; padding: 10px; }
-        input { background: transparent; border: none; color: #22ff22; outline: none; width: 80%; }
-        .ai-reply { color: white; margin: 10px 0; border-left: 2px solid #22ff22; padding-left: 10px; }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minisoft(tm) OS Terminal</title>
+    <!-- Linking your external style.css -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="terminal">
-        <div id="output">MINISOFT(TM) TERMINAL [Version 2.4.0]<br>ONLINE<br>---</div>
-        <div>C:\USERS\DURSU> <input type="text" id="user-input" autofocus></div>
+        <div id="output">
+            MINISOFT(TM) TERMINAL [Version 2.4.0]<br>
+            (C) 2026 MINISOFT CORPORATION. ALL RIGHTS RESERVED.<br>
+            KERNEL STATUS: <span style="color: #22ff22;">ONLINE</span><br>
+            --------------------------------------------------
+        </div>
+        <div class="input-line">
+            <span class="prompt">C:\USERS\CEO></span>
+            <input type="text" id="user-input" autofocus autocomplete="off">
+        </div>
     </div>
+
     <script>
         const input = document.getElementById('user-input');
         const output = document.getElementById('output');
-        // UPDATE THIS AFTER DEPLOYING TO RENDER
-        const API_URL = 'YOUR_RENDER_URL_HERE/chat'; 
+        
+        // This is your official Minisoft(tm) Backend link
+        const API_URL = 'https://minisofttmai.onrender.com/chat'; 
 
-        input.addEventListener('keypress', (e) => {
+        input.addEventListener('keypress', async (e) => {
             if (e.key === 'Enter') {
-                const val = input.value;
-                output.innerHTML += `<div>C:\\USERS\\DURSU> ${val}</div>`;
+                const userMessage = input.value;
+                if (!userMessage.trim()) return;
+
+                // Display user command in the terminal
+                output.innerHTML += `<div><span class="prompt">C:\\USERS\\CEO></span> ${userMessage}</div>`;
                 input.value = '';
-                fetch(API_URL, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({message: val})
-                })
-                .then(res => res.json())
-                .then(data => {
+                
+                // Scroll to bottom
+                output.scrollTop = output.scrollHeight;
+
+                try {
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: userMessage })
+                    });
+
+                    const data = await response.json();
+                    
+                    // Display AI response
                     output.innerHTML += `<div class="ai-reply">${data.response}</div>`;
-                });
+                } catch (error) {
+                    output.innerHTML += `<div class="error">SYSTEM ERROR: Could not connect to Minisoft(tm) Kernel.</div>`;
+                }
+
+                // Auto-scroll after reply
+                output.scrollTop = output.scrollHeight;
             }
         });
     </script>
