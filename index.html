@@ -4,158 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MinisoftTMai - Terminal</title>
-
     <link rel="icon" type="image/png" href="favicon.png">
-
     <style>
-        body {
-            background-color: #0c0c0c;
-            color: #33ff33;
-            font-family: 'Courier New', Courier, monospace;
-            padding: 20px;
-            margin: 0;
-            overflow: hidden;
-        }
-
-        #terminal-container {
-            max-width: 1000px;
-            height: 85vh;
-            margin: 0 auto;
-            border: 1px solid #333;
-            background: #000;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.05);
-        }
-
-        #output {
-            flex-grow: 1;
-            overflow-y: auto;
-            margin-bottom: 10px;
-            white-space: pre-wrap;
-            font-size: 1.1em;
-        }
-
-        .input-area {
-            display: flex;
-            align-items: center;
-        }
-
-        .prompt {
-            color: #66ccff;
-            margin-right: 10px;
-            font-weight: bold;
-        }
-
-        input {
-            background: transparent;
-            border: none;
-            color: #f1f1f1;
-            font-family: inherit;
-            font-size: 1.1em;
-            outline: none;
-            flex-grow: 1;
-        }
-
-        .ai-style {
-            color: #66ccff;
-            font-style: italic;
-            margin: 5px 0;
-        }
-
-        .system-msg {
-            color: #ffff33;
-        }
-
-        #bottom-bar {
-            margin-top: 15px;
-            text-align: center;
-            font-size: 0.8em;
-            color: #444;
-            border-top: 1px solid #222;
-            padding-top: 5px;
-        }
+        body { background-color: #0c0c0c; color: #33ff33; font-family: 'Courier New', monospace; padding: 20px; margin: 0; overflow: hidden; }
+        #terminal-container { max-width: 1000px; height: 85vh; margin: 0 auto; border: 1px solid #333; background: #000; padding: 15px; display: flex; flex-direction: column; }
+        #output { flex-grow: 1; overflow-y: auto; margin-bottom: 10px; white-space: pre-wrap; font-size: 1.1em; }
+        .input-area { display: flex; align-items: center; }
+        .prompt { color: #66ccff; margin-right: 10px; font-weight: bold; }
+        input { background: transparent; border: none; color: #f1f1f1; font-family: inherit; font-size: 1.1em; outline: none; flex-grow: 1; }
+        #bottom-bar { margin-top: 15px; text-align: center; font-size: 0.8em; color: #444; border-top: 1px solid #222; padding-top: 5px; }
     </style>
 </head>
 <body>
-
 <div id="terminal-container">
-    <div id="output">
-MinisoftTM Terminal [Version 1.2.0]
+    <div id="output">MinisoftTM Terminal [Version 1.2.0]
 (c) 2026 Minisoft Corporation. All rights reserved.
 
-Type 'help' to see commands.
-    </div>
-    
+Type 'help' to see commands.</div>
     <div class="input-area">
-        <span class="prompt">C:/Users/Guest&gt;</span>
+        <span class="prompt">C:/Users/Guest></span>
         <input type="text" id="cmd-input" autofocus autocomplete="off">
     </div>
 </div>
-
-<div id="bottom-bar">
-    [ Kernel: Windows 2003 Lite ] | [ AI: Gemini Pro ] | [ dreampro366.github.io ]
-</div>
+<div id="bottom-bar">[ Kernel: Windows 2003 Lite ] | [ AI: Gemini Pro ]</div>
 
 <script>
     const input = document.getElementById('cmd-input');
     const output = document.getElementById('output');
-
-    // Make clicking anywhere on the screen focus the input
-    document.addEventListener('click', () => input.focus());
-
     input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             const val = input.value;
-            if (val.trim() === "") return;
-
+            if (!val.trim()) return;
             printLine(`\nC:/Users/Guest> ${val}`);
-            handleCommand(val.trim());
+            handleCommand(val.trim().toLowerCase());
             input.value = '';
             output.scrollTop = output.scrollHeight;
         }
     });
-
-    function printLine(text, className = "") {
+    function printLine(text) {
         const div = document.createElement('div');
-        if (className) div.className = className;
         div.innerText = text;
         output.appendChild(div);
     }
-
     function handleCommand(cmd) {
-        const lowerCmd = cmd.toLowerCase();
-
-        if (lowerCmd === 'help') {
-            printLine("AVAILABLE COMMANDS:", "system-msg");
-            printLine(" help    - Shows this list");
-            printLine(" cls     - Clears the terminal screen");
-            printLine(" ver     - Shows Minisoft version info");
-            printLine(" ai [msg]- Talk to the integrated Gemini AI");
-        } 
-        else if (lowerCmd === 'cls') {
-            output.innerText = 'MinisoftTM Terminal [Version 1.2.0]\n';
-        }
-        else if (lowerCmd === 'ver') {
-            printLine("MinisoftTM Operating System [LITE EDITION] - Built for Speed.", "system-msg");
-        }
-        else if (lowerCmd.startsWith('ai ')) {
-            const userQuery = cmd.substring(3);
-            printLine(`> System: Sending request to AI Core regarding "${userQuery}"...`, "ai-style");
-            
-            // SIMULATED RESPONSE 
-            // (You can replace this with your actual fetch() call later!)
-            setTimeout(() => {
-                printLine(`AI: I have received your request. Since we are in the Minisoft Terminal, I am standing by to assist with your programming or storm-chasing queries.`, "ai-style");
-                output.scrollTop = output.scrollHeight;
-            }, 800);
-        }
-        else {
-            printLine(`'${cmd}' is not recognized as an internal or external command.`, "system-msg");
-        }
+        if (cmd === 'help') printLine("Commands: help, cls, ver, ai [msg]");
+        else if (cmd === 'cls') output.innerText = 'MinisoftTM Terminal [Version 1.2.0]\n';
+        else if (cmd === 'ver') printLine("MinisoftTM OS [LITE]");
+        else if (cmd.startsWith('ai')) printLine("AI: Initializing connection... (Ready for input)");
+        else printLine(`'${cmd}' is not recognized.`);
     }
 </script>
-
 </body>
 </html>
