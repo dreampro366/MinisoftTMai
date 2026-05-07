@@ -3,143 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minisoft(tm) OS Terminal</title>
+    <title>MinisoftTMai - Terminal</title>
+
+    <link rel="icon" type="image/png" href="favicon.png">
+
     <style>
         body {
             background-color: #0c0c0c;
-            color: #cccccc;
+            color: #33ff33;
             font-family: 'Courier New', Courier, monospace;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        #terminal {
-            width: 90%;
-            max-width: 900px;
-            height: 80vh;
-            background-color: #000000;
-            border: 1px solid #333;
             padding: 20px;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
-            overflow-y: auto;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #terminal-container {
+            max-width: 1000px;
+            height: 85vh;
+            margin: 0 auto;
+            border: 2px solid #333;
+            background: #000;
+            padding: 15px;
             display: flex;
             flex-direction: column;
         }
+
         #output {
-            white-space: pre-wrap;
+            flex-grow: 1;
+            overflow-y: auto;
             margin-bottom: 10px;
+            white-space: pre-wrap;
         }
-        .input-line {
+
+        .input-area {
             display: flex;
+            align-items: center;
         }
+
         .prompt {
-            color: #3b82f6;
+            color: #66ccff;
             margin-right: 10px;
-            white-space: nowrap;
+            font-weight: bold;
         }
+
         input {
             background: transparent;
             border: none;
-            color: #ffffff;
+            color: #f1f1f1;
             font-family: inherit;
-            font-size: inherit;
+            font-size: 1.1em;
             outline: none;
             flex-grow: 1;
         }
-        .ai-reply {
-            color: #ffffff;
-            margin: 10px 0;
-        }
-        .error {
-            color: #ff5555;
+
+        #bottom-bar {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 0.8em;
+            color: #555;
+            border-top: 1px solid #222;
+            padding-top: 5px;
         }
     </style>
 </head>
 <body>
-    <div id="terminal">
-        <div id="output">
-            MINISOFT(TM) TERMINAL [Version 2.4.0]
-            (C) 2026 MINISOFT CORPORATION. ALL RIGHTS RESERVED.
-            KERNEL STATUS: ONLINE
-            --------------------------------------------------
-            Type a command to begin.
-        </div>
-        <div class="input-line">
-            <span class="prompt" id="prompt-label">C:\USERS\USER></span>
-            <input type="text" id="user-input" autofocus autocomplete="off">
-        </div>
+
+<div id="terminal-container">
+    <div id="output">
+MinisoftTM Terminal [Version 1.2.0]
+(c) 2026 Minisoft Corporation. All rights reserved.
+
+Type 'help' to see commands.
     </div>
+    
+    <div class="input-area">
+        <span class="prompt">C:/Users/Guest></span>
+        <input type="text" id="cmd-input" autofocus autocomplete="off">
+    </div>
+</div>
 
-    <script>
-        const input = document.getElementById('user-input');
-        const output = document.getElementById('output');
-        const promptLabel = document.getElementById('prompt-label');
-        
-        // Ensure these URLs match your Render service name
-        const API_URL = 'https://minisofttmai.onrender.com/chat'; 
-        const VERIFY_URL = 'https://minisofttmai.onrender.com/verify-secret'; 
+<div id="bottom-bar">
+    [ Kernel: Windows 2003 Lite ] | [ AI: Gemini Pro ] | [ dreampro366.github.io ]
+</div>
 
-        input.addEventListener('keypress', async (e) => {
-            if (e.key === 'Enter') {
-                const userMessage = input.value;
-                if (!userMessage.trim()) return;
+<script>
+    const input = document.getElementById('cmd-input');
+    const output = document.getElementById('output');
 
-                // Display user command in output
-                const currentPrompt = promptLabel.innerText;
-                output.innerHTML += `<div><span class="prompt">${currentPrompt}</span> ${userMessage}</div>`;
-                input.value = '';
-
-                // 1. Check for the Secret CEO Phrase via Render
-                try {
-                    const verifyResponse = await fetch(VERIFY_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ secret: userMessage })
-                    });
-                    const verifyData = await verifyResponse.json();
-
-                    if (verifyData.status === "success") {
-                        promptLabel.innerText = "C:\\USERS\\CEO>";
-                        output.innerHTML += `<div class="ai-reply">
-                            Hello! I am Minisoft(tm) AI. It is a pleasure to meet you.<br><br>
-                            I am proud to be a creation of the Minisoft CEO, whose incredible hard work and relentless perseverance have made everything we do possible. Their dedication to innovation is truly inspiring.<br><br>
-                            How can I assist you today, Boss?
-                        </div>`;
-                        scrollToBottom();
-                        return; 
-                    }
-                } catch (err) {
-                    console.log("Verification check skipped or failed.");
-                }
-
-                // 2. Regular AI Chat Flow
-                try {
-                    const response = await fetch(API_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ message: userMessage })
-                    });
-
-                    const data = await response.json();
-                    if (data.response) {
-                        output.innerHTML += `<div class="ai-reply">${data.response}</div>`;
-                    } else {
-                        output.innerHTML += `<div class="error">SYSTEM ERROR: Invalid kernel response.</div>`;
-                    }
-                } catch (error) {
-                    output.innerHTML += `<div class="error">SYSTEM ERROR: Kernel connection lost.</div>`;
-                }
-
-                scrollToBottom();
-            }
-        });
-
-        function scrollToBottom() {
-            const terminal = document.getElementById('terminal');
-            terminal.scrollTop = terminal.scrollHeight;
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            const val = input.value;
+            printLine(`\nC:/Users/Guest> ${val}`);
+            handleCommand(val.toLowerCase().trim());
+            input.value = '';
+            output.scrollTop = output.scrollHeight;
         }
-    </script>
+    });
+
+    function printLine(text) {
+        const div = document.createElement('div');
+        div.innerText = text;
+        output.appendChild(div);
+    }
+
+    function handleCommand(cmd) {
+        if (cmd === 'help') {
+            printLine("AVAILABLE COMMANDS: help, cls, ver, ai");
+        } 
+        else if (cmd === 'cls') {
+            output.innerText = 'MinisoftTM Terminal [Version 1.2.0]\n';
+        }
+        else if (cmd === 'ver') {
+            printLine("MinisoftTM Operating System [LITE EDITION]");
+        }
+        else if (cmd.startsWith('ai')) {
+            printLine("> System is processing AI request...");
+            // Your API logic goes here
+        }
+        else {
+            printLine(`'${cmd}' is not recognized as an internal or external command.`);
+        }
+    }
+</script>
+
 </body>
 </html>
