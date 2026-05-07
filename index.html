@@ -21,11 +21,12 @@
             max-width: 1000px;
             height: 85vh;
             margin: 0 auto;
-            border: 2px solid #333;
+            border: 1px solid #333;
             background: #000;
             padding: 15px;
             display: flex;
             flex-direction: column;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.05);
         }
 
         #output {
@@ -33,6 +34,7 @@
             overflow-y: auto;
             margin-bottom: 10px;
             white-space: pre-wrap;
+            font-size: 1.1em;
         }
 
         .input-area {
@@ -56,11 +58,21 @@
             flex-grow: 1;
         }
 
+        .ai-style {
+            color: #66ccff;
+            font-style: italic;
+            margin: 5px 0;
+        }
+
+        .system-msg {
+            color: #ffff33;
+        }
+
         #bottom-bar {
             margin-top: 15px;
             text-align: center;
             font-size: 0.8em;
-            color: #555;
+            color: #444;
             border-top: 1px solid #222;
             padding-top: 5px;
         }
@@ -77,7 +89,7 @@ Type 'help' to see commands.
     </div>
     
     <div class="input-area">
-        <span class="prompt">C:/Users/Guest></span>
+        <span class="prompt">C:/Users/Guest&gt;</span>
         <input type="text" id="cmd-input" autofocus autocomplete="off">
     </div>
 </div>
@@ -90,38 +102,57 @@ Type 'help' to see commands.
     const input = document.getElementById('cmd-input');
     const output = document.getElementById('output');
 
+    // Make clicking anywhere on the screen focus the input
+    document.addEventListener('click', () => input.focus());
+
     input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             const val = input.value;
+            if (val.trim() === "") return;
+
             printLine(`\nC:/Users/Guest> ${val}`);
-            handleCommand(val.toLowerCase().trim());
+            handleCommand(val.trim());
             input.value = '';
             output.scrollTop = output.scrollHeight;
         }
     });
 
-    function printLine(text) {
+    function printLine(text, className = "") {
         const div = document.createElement('div');
+        if (className) div.className = className;
         div.innerText = text;
         output.appendChild(div);
     }
 
     function handleCommand(cmd) {
-        if (cmd === 'help') {
-            printLine("AVAILABLE COMMANDS: help, cls, ver, ai");
+        const lowerCmd = cmd.toLowerCase();
+
+        if (lowerCmd === 'help') {
+            printLine("AVAILABLE COMMANDS:", "system-msg");
+            printLine(" help    - Shows this list");
+            printLine(" cls     - Clears the terminal screen");
+            printLine(" ver     - Shows Minisoft version info");
+            printLine(" ai [msg]- Talk to the integrated Gemini AI");
         } 
-        else if (cmd === 'cls') {
+        else if (lowerCmd === 'cls') {
             output.innerText = 'MinisoftTM Terminal [Version 1.2.0]\n';
         }
-        else if (cmd === 'ver') {
-            printLine("MinisoftTM Operating System [LITE EDITION]");
+        else if (lowerCmd === 'ver') {
+            printLine("MinisoftTM Operating System [LITE EDITION] - Built for Speed.", "system-msg");
         }
-        else if (cmd.startsWith('ai')) {
-            printLine("> System is processing AI request...");
-            // Your API logic goes here
+        else if (lowerCmd.startsWith('ai ')) {
+            const userQuery = cmd.substring(3);
+            printLine(`> System: Sending request to AI Core regarding "${userQuery}"...`, "ai-style");
+            
+            // SIMULATED RESPONSE 
+            // (You can replace this with your actual fetch() call later!)
+            setTimeout(() => {
+                printLine(`AI: I have received your request. Since we are in the Minisoft Terminal, I am standing by to assist with your programming or storm-chasing queries.`, "ai-style");
+                output.scrollTop = output.scrollHeight;
+            }, 800);
         }
         else {
-            printLine(`'${cmd}' is not recognized as an internal or external command.`);
+            printLine(`'${cmd}' is not recognized as an internal or external command.`, "system-msg");
         }
     }
 </script>
